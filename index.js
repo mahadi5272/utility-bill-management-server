@@ -28,6 +28,9 @@ async function run() {
     // create collection mongodb
     const bills = client.db("Bill-Manegment");
     const billcollection = bills.collection("Bills");
+    // 🔹 নতুন collection তৈরি হচ্ছে — Payments নামে
+    const paymentCollection = bills.collection("Payments");
+
     app.get("/bills", async (req, res) => {
       const cursor = billcollection.find();
       const result = await cursor.toArray();
@@ -38,7 +41,7 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
-     // Bills Details
+    // Bills Details
     app.get("/billDetails/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -48,8 +51,18 @@ async function run() {
 
     app.post("/payBill", async (req, res) => {
       const payBill = req.body;
+      const result = await paymentCollection.insertOne(payBill);
+      res.send(result);
     });
-   
+    // My Bill page
+    app.get("/myBills", async (req, res) => {
+      const email = req.query.email;
+      const query = {
+        email: email,
+      };
+      const result = await paymentCollection.find(query).toArray();
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log("database con..");
