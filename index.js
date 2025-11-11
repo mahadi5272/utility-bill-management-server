@@ -38,6 +38,17 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+     // Bills Details
+    app.get("/billDetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await billcollection.findOne(query);
+      res.send(result);
+    });
+
+    app.post("/payBill", async (req, res) => {
+      const payBill = req.body;
+    });
    
 
     await client.db("admin").command({ ping: 1 });
