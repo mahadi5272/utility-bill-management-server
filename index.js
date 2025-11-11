@@ -29,6 +29,13 @@ async function run() {
     // create collection mongodb
     const bills = client.db("Bill-Manegment");
     const billcollection = bills.collection("Bills");
+        app.get("/bills", async (req, res) => {
+      const cursor = billcollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("database con..");
