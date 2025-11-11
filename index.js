@@ -23,7 +23,19 @@ app.get("/", (req, res) => {
   res.send("Hello Assignment!");
 });
 
+async function run() {
+  try {
 
+    // create collection mongodb
+    const bills = client.db("Bill-Manegment");
+    const billcollection = bills.collection("Bills");
+
+    await client.db("admin").command({ ping: 1 });
+    console.log("database con..");
+  } finally {
+  }
+}
+run().catch(console.dir);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
