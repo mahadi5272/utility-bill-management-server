@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+require('dotenv').config()
 const port = 3000;
 
 // MiddeleWear
@@ -10,7 +11,7 @@ app.use(express.json());
 // mongodb
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri =
-  "mongodb+srv://BillManegement:bZiZORRqTlW565OD@mahdi.ow7tc2p.mongodb.net/?appName=Mahdi";
+  `mongodb+srv://${process.env.BillmManegement}:${process.env.BillPassword}@mahdi.ow7tc2p.mongodb.net/?appName=Mahdi`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -32,6 +33,13 @@ async function run() {
     const paymentCollection = bills.collection("Payments");
 
     app.get("/bills", async (req, res) => {
+      // fitter
+      const category = req.query.category;
+      let query = {}
+      if(category){
+        query = {category}
+      }
+
       const cursor = billcollection.find();
       const result = await cursor.toArray();
       res.send(result);
@@ -64,8 +72,34 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
-    console.log("database con..");
+    // my bill delete
+    app.delete("/myBills/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await paymentCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // update
+    app.put("/myBills/:id", async (req, res) => {
+      const { id } = req.params;
+      const data = req.body;
+      const Objectid = new ObjectId(id);
+      const fillter = { _id: Objectid };
+      const update = {
+        $set: {
+          amount: data.amount,
+          address: data.address,
+          phone: data.phone,
+          date: data.date,
+        },
+      };
+      const result = await paymentCollection.updateOne(fillter, update);
+      res.send(result);
+    });
+
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("database con..");
   } finally {
   }
 }
